@@ -39,7 +39,7 @@ set-up are computing accuracy of predicting the last sub-token with beam search 
 beam width of 5. 
 
 ## Full accuracy evaluation results:
-where $\alpha^{*}_{k}=-0.6$ and $k^{*}=10$
+where $ \alpha^{*}_{k}=-0.6 $ and $ k^{*}=10 $
 
 | GPT2  (124M)                              | lw_acc | ft_acc | lt_acc | ft_beam_acc | lt_beam_acc |
 | ---                                 | ---    | ---    | ---    | ---         |    ---      |
