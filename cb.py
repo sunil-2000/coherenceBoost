@@ -1,4 +1,5 @@
 import torch
+from tqdm import tqdm
 from datasets import Dataset
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, GPT2LMHeadModel
@@ -26,7 +27,6 @@ class CB:
 
         fmax(bool): whether to return og model output as well
         decode(bool): output token or word representation
-
         """
         encoded_x = self.tokenizer(x, return_tensors="pt")["input_ids"]
         encoded_short_x = encoded_x[0][-self.k :][None, :]
@@ -76,9 +76,7 @@ class CB:
 
         # run predictions in batches
         preds = []
-        for i, data in enumerate(dataloader):
-            print(f"processing batch {i}")
-
+        for i, data in enumerate(tqdm(dataloader)):
             input_ids = data["input_ids"].to(self.device)
             mask = data["attention_mask"].to(self.device)
             out = self.model.generate(
@@ -92,13 +90,15 @@ class CB:
             pred_token = torch.argmax(out, axis=1).to("cpu")
             pred_token = pred_token.tolist()
             preds.extend(pred_token)
-            print("-" * 50)
 
         return preds
 
-    def boosted_batched_generate(self, X, batch_size=32, fmax_score=False):
+    def boosted_batched_generate(
+        self, X, batch_size=32, fmax_score=False, beam_width=1
+    ):
         """
-        batched generation with boosted generation
+        boosted batched generation
+        fmax_score(bool): output boosted and non-boosted predictions
         """
         encoded_inputs = self.tokenizer(X, padding=True, return_tensors="pt")
         encoded_inputs.to(self.device)
@@ -111,9 +111,7 @@ class CB:
         # run predictions in batches
         preds_fmax = []
         preds = []
-        for i, data in enumerate(dataloader):
-            print(f"processing batch {i}")
-
+        for i, data in enumerate(tqdm(dataloader)):
             input_ids = data["input_ids"].to(self.device)
             short_input_ids = data["input_ids"][:, -self.k :].to(self.device)
             mask = data["attention_mask"].to(self.device)
@@ -139,21 +137,29 @@ class CB:
 
             boosted_score = out + self.alpha * out_k
             pred_token = torch.argmax(boosted_score, axis=1).to("cpu")
+            if beam_width > 1:
+                pred_token = torch.argsort(boosted_score, axis=1, descending=True).to(
+                    "cpu"
+                )[:, :beam_width]
             pred_token = pred_token.tolist()
             preds.extend(pred_token)
 
             if fmax_score:
                 pred_token = torch.argmax(out, axis=1).to("cpu")
+                if beam_width > 1:
+                    pred_token = torch.argsort(out, axis=1, descending=True).to("cpu")[
+                        :, :beam_width
+                    ]
                 pred_token = pred_token.tolist()
                 preds_fmax.extend(pred_token)
 
-            print("-" * 50)
-
         return preds if not fmax_score else preds, preds_fmax
 
-    def tokenize_label(self, Y):
+    def tokenize_label(self, Y, rev=False):
         """
         convert true label to their token representation
         Y: 1D list of target labels (str)
+        rev(bool): whether to return first or last subtoken of label
         """
-        return [self.tokenizer(i)["input_ids"][0] for i in Y]
+        idx = 0 if not rev else -1
+        return [self.tokenizer(i)["input_ids"][idx] for i in Y]
