@@ -21,7 +21,7 @@ in the jupyter notebook (demo.ipynb). While, the accuracy results do not match
 the table exactly from the notebook, each result shows that coherence boosting
 improves performance on LAMBADA significantly. This aligns with the findings
 from the paper. The results that I believe most closely follow the experimental 
-set-up are computing accuracy of predicting the last sub-token with beam search (beam_width=5). I use a beam width of 5 because this is how OpenAI seems to have evaluated GPT2 (https://github.com/openai/gpt-2/issues/131). GPT2-small achieves an accuracy of 46.1% and the boosted GPT2-small achieves an accuracy of 60.4%; the paper achieved 47.66% and 66.70% respectively. Below are all the accuracies GPT2-small achieved under different accuracy criterions.
+set-up are computing accuracy of predicting the last sub-token with beam search (beam_width=5). I use a beam width of 5 because this is how OpenAI seems to have evaluated GPT2 (https://github.com/openai/gpt-2/issues/131). GPT2-small achieves an accuracy of 46.1% and the boosted GPT2-small achieves an accuracy of 60.4%; the paper achieved 47.66% and 66.70% respectively. The second table below contains all the accuracies that GPT2-small achieved under different accuracy criterions.
 
 |  GPT2  (124M)                                |   Results      | Paper Results |
 | ---                                    | ----           | ---           |
