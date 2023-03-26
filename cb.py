@@ -16,6 +16,7 @@ class CB:
         self.tokenizer.padding_side = "left"
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.model = GPT2LMHeadModel.from_pretrained(model_id)
+        self.model.config.pad_token_id = self.model.config.eos_token_id
         self.model.to(self.device)
         self.alpha = alpha
         self.k = k
@@ -61,27 +62,43 @@ class CB:
         )
         return self.tokenizer.decode(output["scores"][0].argmax())
 
+    def load_data(self, encoded_inputs, batch_size):
+        """
+        return dataloader and dataset of input
+        """
+
+        def ctx_target_split(example):
+            example["ctx"] = example["input_ids"][:-1]
+            example["target"] = example["input_ids"][-1]
+            return example
+
+        # generate dataset to process in batches
+        dataset = Dataset.from_dict(encoded_inputs)
+        dataset = dataset.map(ctx_target_split)
+        dataset.set_format(
+            type="torch", columns=["ctx", "target", "input_ids", "attention_mask"]
+        )
+        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+        return dataloader, dataset
+
     def batched_generate(self, X, batch_size=32):
         """
         generate batched predictions and return generated token ids
         X: 2D list of passages
+        returns dict {preds, targets}
         """
         encoded_inputs = self.tokenizer(X, padding=True, return_tensors="pt")
         encoded_inputs.to(self.device)
-
-        # generate dataset to process in batches
-        dataset = Dataset.from_dict(encoded_inputs)
-        dataset.set_format(type="torch", columns=["input_ids", "attention_mask"])
-        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+        dataloader, dataset = self.load_data(encoded_inputs, batch_size)
 
         # run predictions in batches
         preds = []
-        for i, data in enumerate(tqdm(dataloader)):
-            input_ids = data["input_ids"].to(self.device)
+        for data in tqdm(dataloader):
+            input_ids = data["ctx"].to(self.device)
             mask = data["attention_mask"].to(self.device)
             out = self.model.generate(
                 input_ids,
-                attention_mask=mask,
+                attention_mask=mask[:, :-1],
                 output_scores=True,
                 return_dict_in_generate=True,
                 max_new_tokens=1,
@@ -91,36 +108,28 @@ class CB:
             pred_token = pred_token.tolist()
             preds.extend(pred_token)
 
-        return preds
+        return {"preds": torch.tensor(preds), "targets": dataset["target"]}
 
-    def boosted_batched_generate(
-        self, X, batch_size=32, fmax_score=False, beam_width=1
-    ):
+    def boosted_batched_generate(self, X, batch_size=32, fmax_score=False):
         """
         boosted batched generation
         fmax_score(bool): output boosted and non-boosted predictions
         """
         encoded_inputs = self.tokenizer(X, padding=True, return_tensors="pt")
         encoded_inputs.to(self.device)
-
-        # generate dataset to process in batches
-        dataset = Dataset.from_dict(encoded_inputs)
-        dataset.set_format(type="torch", columns=["input_ids", "attention_mask"])
-        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+        dataloader, dataset = self.load_data(encoded_inputs, batch_size)
 
         # run predictions in batches
         preds_fmax = []
         preds = []
-        for i, data in enumerate(tqdm(dataloader)):
-            input_ids = data["input_ids"].to(self.device)
-            short_input_ids = data["input_ids"][:, -self.k :].to(self.device)
+        for data in tqdm(dataloader):
+            input_ids = data["ctx"].to(self.device)
+            short_input_ids = data["ctx"][:, -self.k :].to(self.device)
             mask = data["attention_mask"].to(self.device)
-            mask_k = torch.zeros(short_input_ids.shape).to(self.device)
-            mask_k[:, -self.k :] = 1
 
             out = self.model.generate(
                 input_ids,
-                attention_mask=mask,
+                attention_mask=mask[:, :-1],
                 output_scores=True,
                 return_dict_in_generate=True,
                 max_new_tokens=1,
@@ -128,7 +137,6 @@ class CB:
             )["scores"][0]
             out_k = self.model.generate(
                 short_input_ids,
-                attention_mask=mask_k,
                 output_scores=True,
                 return_dict_in_generate=True,
                 max_new_tokens=1,
@@ -137,23 +145,18 @@ class CB:
 
             boosted_score = out + self.alpha * out_k
             pred_token = torch.argmax(boosted_score, axis=1).to("cpu")
-            if beam_width > 1:
-                pred_token = torch.argsort(boosted_score, axis=1, descending=True).to(
-                    "cpu"
-                )[:, :beam_width]
             pred_token = pred_token.tolist()
             preds.extend(pred_token)
 
             if fmax_score:
                 pred_token = torch.argmax(out, axis=1).to("cpu")
-                if beam_width > 1:
-                    pred_token = torch.argsort(out, axis=1, descending=True).to("cpu")[
-                        :, :beam_width
-                    ]
                 pred_token = pred_token.tolist()
                 preds_fmax.extend(pred_token)
 
-        return preds if not fmax_score else preds, preds_fmax
+        out = {"preds_cb": torch.tensor(preds), "targets": dataset["target"]}
+        if fmax_score:
+            out["preds_fmax"] = torch.tensor(preds_fmax)
+        return out
 
     def tokenize_label(self, Y, rev=False):
         """
