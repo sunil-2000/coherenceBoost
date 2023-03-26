@@ -3,7 +3,7 @@
 Replication project for [Coherence boosting: When your pretrained language model is not paying enough attention](https://arxiv.org/pdf/2110.08294.pdf)
 
 I attempt to reproduce exact results of GPT2 and the coherence boosted GPT2
-evaluation on LAMBADA; this is from Table 1 in the paper.
+accuracy evaluations on LAMBADA; this is from Table 1 in the paper.
 
 ![Table1](table.png)
 
@@ -57,4 +57,4 @@ $\dagger$ are the GPT-2 parameter counts from the paper.
 
 ### Potential Reason for LAMBADA Accuracy Discrepencies
 
-The gpt models on hugging face have parameter counts that are slightly different from the reported number of parameters the gpt2 models in the paper (e.g., gpt2-small 125M (paper) vs 124M(hugging face), gpt2-large 760M (paper) vs 774M (hugging face)). 
+The GPT-2 models on hugging face have parameter counts that are slightly different from the reported number of parameters the GPT2 models have in the paper (e.g., GPT-2-small 125M (paper) vs 124M (hugging face), GPT-2-large 760M (paper) vs 774M (hugging face)). 
