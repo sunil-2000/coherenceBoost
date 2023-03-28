@@ -15,9 +15,7 @@ First, OpenAI pre-processed the LAMBADA dataset and evaluated GPT2 on this
 [pre-processed version](https://huggingface.co/datasets/EleutherAI/lambada_openai).
 I found this out as evaluation on the standard [LAMBADA dataset](https://huggingface.co/datasets/lambada) yielded strictly worse results compared to the processed LAMBADA dataset.
 
-Because it is not entirely clear how OpenAI or the authors of the paper evaluated
-GPT, I tried 5 different evaluation accuracies and share the results below and
-in the jupyter notebook (demo.ipynb). While, the accuracy results do not match
+While, the accuracy results do not match
 the table exactly from the notebook, each result shows that coherence boosting
 improves performance on LAMBADA significantly. This aligns with the findings
 from the paper. The results that I believe most closely follow the experimental 
