@@ -21,7 +21,7 @@ improves performance on LAMBADA significantly. This aligns with the findings
 from the paper. The results that I believe most closely follow the experimental 
 set-up are computing accuracy of predicting the last sub-token. GPT-2-small achieves an accuracy of 46.67% and the boosted GPT-2-small achieves an accuracy of 64.70%; the paper achieves 47.66% and 66.70% respectively. Below are all the accuracies results of the varying sizes of GPT-2.
 
-All accuracy results are obtained using one GPU (Tesla A100) through Colab. 
+All accuracy results are obtained using one GPU ($\texttt{Tesla A100}$) through Colab. 
 
 |  GPT-2  $(124M, 125M_{\dagger})$                               |   Results      | Paper Results |
 | ---                                    | ----           | ---           |
