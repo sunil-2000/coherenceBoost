@@ -2,16 +2,16 @@
 
 Replication project for [Coherence boosting: When your pretrained language model is not paying enough attention](https://arxiv.org/pdf/2110.08294.pdf)
 
-I attempt to reproduce exact results of GPT2 and the coherence boosted GPT2
+I attempt to reproduce exact results of GPT-2 and the coherence boosted GPT-2
 accuracy evaluations on LAMBADA; this is from Table 1 in the paper.
 
 ![Table1](table.png)
 
 The authors of the paper state, "We perform experiments with the GPT family of
 models, closely replicating the evaluation setting of Radford et al. (2019)." As such,
-I evaluate GPT2 similar to how OpenAI evaluated their model. However, I quickly
-discovered that their evaluation setting for GPT is not best documented. [Others](https://github.com/openai/gpt-2/issues/131) have expressed confusion over how OpenAI evaluated GPT.
-First, OpenAI pre-processed the LAMBADA dataset and evaluated GPT2 on this
+I evaluate GPT-2 similar to how OpenAI evaluated their model. However, I quickly
+discovered that their evaluation setting for GPT-2 is not best documented. [Others](https://github.com/openai/gpt-2/issues/131) have expressed confusion over how OpenAI evaluated GPT.
+First, OpenAI pre-processed the LAMBADA dataset and evaluated GPT-2 on this
 [pre-processed version](https://huggingface.co/datasets/EleutherAI/lambada_openai).
 I found this out as evaluation on the standard [LAMBADA dataset](https://huggingface.co/datasets/lambada) yielded strictly worse results compared to the processed LAMBADA dataset.
 
