@@ -2,11 +2,22 @@
 
 Replication project for [Coherence boosting: When your pretrained language model is not paying enough attention](https://arxiv.org/pdf/2110.08294.pdf)
 
-I attempt to reproduce exact results of GPT2 and the coherence boosted GPT2
-accuracy evaluations on LAMBADA; this is from Table 1 in the paper.
+I attempt to reproduce exact results of GPT and coherence boosted GPT
+accuracy evaluations on LAMBADA; this is Table 1 in the paper.
 
 ![Table1](table.png)
 
+## Results
+|    | GPT-2 (124M) | GPT-2 (355M) | GPT-2 (774M) | GPT-2 (1.5B) |  GPT-3 (ada) | GPT-3 (babbage) | GPT-3 (curie) | GPT-3 (davinci) |
+| ---|      ---     | ---          |    ---       |   ---        |  ---         |     ---         | ---           | ---             |
+| $f_{max}$   | 46.1%          |  55.0%        |    58.76%      | 61.42%          |   61.52%        | 65.53%             |   75.57%         |  80.44%           |
+|  CB ($\alpha_{k} = \alpha^{*}_{k} $)| 60.4%          |  71.41%         |    74.13%       | 74.75%          |   66.58%       | 67.36%             |   78.98%         |  82.07%          |
+| $\alpha^{*}_{k}$ | -0.6         |  -0.5        |    -0.5       | -0.5          |   -0.3      | -0.3           |   -0.3        |  -0.2         |
+| ${k}$ | 10         |  11        |    10       | 9          |   9      | 10           |   3        |  3        |
+
+
+
+### GPT-2 Evaluations
 The authors of the paper state, "We perform experiments with the GPT family of
 models, closely replicating the evaluation setting of Radford et al. (2019)." As such,
 I evaluate GPT2 similar to how OpenAI evaluated their model. However, I quickly
@@ -55,6 +66,13 @@ All accuracy results are obtained using one GPU (Tesla A100) through Colab.
 
 $\dagger$ are the GPT-2 parameter counts from the paper.
 
+### GPT-3 Evaluations
+
+All GPT-3 Evaluations are obtained by using OpenAI's Completions [API](https://platform.openai.com/docs/api-reference/completions?lang=python). One unfortunate constraint of this endpoint is that it only returns the top-5 logits corresponding to the tokens with highest probability. This might explain the magnitude differences between the boosted and regular model accuracies observed here and in the paper. By limiting to only top-5 logits, less information from the short context model is influencing the full-context model's output. Still, however, the results are consistent with the findings from the paper: coherence boosting improves long-range dependencies for LLMs. 
+
+
 ### Potential Reason for LAMBADA Accuracy Discrepencies
 
 The GPT-2 models on hugging face have parameter counts that are slightly different from the reported number of parameters the GPT2 models have in the paper (e.g., GPT-2-small 125M (paper) vs 124M (hugging face), GPT-2-large 760M (paper) vs 774M (hugging face)). 
+
+The GPT-3 models provided as endpoints might not be exactly the same GPT-3 models evaluated in the paper. The mapping of ada -> 2.7B, babbage -> 6.7B, curie -> 13B, davinci -> 175B is not defined explicitly, but it seems that this mapping is somewhat appropriate (https://blog.eleuther.ai/gpt3-model-sizes/). As these are the only GPT-3 models available, I conducted the evaluation on these GPT-3 variants.  

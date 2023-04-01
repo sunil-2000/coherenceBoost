@@ -1,0 +1,5 @@
+model, alpha, k
+ada (~gpt3-2.7B), -0.3, 9
+babbage(~gpt3-6.7B), -0.3, 10 
+curie(~gpt3-13B), -0.3, 3
+davinci(~gpt3-175B), -0.2, 3
