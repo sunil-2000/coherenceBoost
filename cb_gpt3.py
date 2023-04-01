@@ -136,7 +136,7 @@ class CBGPT3:
                     cb_logits[j] = cb_logits[j] - self.alpha * s_logits[j]
                     cb_logits1[j] = cb_logits1[j] - self.alpha * s_logits[j]
                 else:
-                    cb_logits[j] = cb_logits[j] + self.alpha * unk_logprob
+                    cb_logits[j] = cb_logits[j] - self.alpha * unk_logprob
 
             cb_token = tokens[np.argmax(cb_logits)]
             cb_token1 = tokens[np.argmax(cb_logits1)]
