@@ -20,21 +20,19 @@ accuracy evaluations on LAMBADA; this is Table 1 in the paper.
 ### GPT-2 Evaluations
 The authors of the paper state, "We perform experiments with the GPT family of
 models, closely replicating the evaluation setting of Radford et al. (2019)." As such,
-I evaluate GPT2 similar to how OpenAI evaluated their model. However, I quickly
-discovered that their evaluation setting for GPT is not best documented. [Others](https://github.com/openai/gpt-2/issues/131) have expressed confusion over how OpenAI evaluated GPT.
-First, OpenAI pre-processed the LAMBADA dataset and evaluated GPT2 on this
+I evaluate GPT-2 similar to how OpenAI evaluated their model. However, I quickly
+discovered that their evaluation setting for GPT-2 is not best documented. [Others](https://github.com/openai/gpt-2/issues/131) have expressed confusion over how OpenAI evaluated GPT.
+First, OpenAI pre-processed the LAMBADA dataset and evaluated GPT-2 on this
 [pre-processed version](https://huggingface.co/datasets/EleutherAI/lambada_openai).
 I found this out as evaluation on the standard [LAMBADA dataset](https://huggingface.co/datasets/lambada) yielded strictly worse results compared to the processed LAMBADA dataset.
 
-Because it is not entirely clear how OpenAI or the authors of the paper evaluated
-GPT, I tried 5 different evaluation accuracies and share the results below and
-in the jupyter notebook (demo.ipynb). While, the accuracy results do not match
+While, the accuracy results do not match
 the table exactly from the notebook, each result shows that coherence boosting
 improves performance on LAMBADA significantly. This aligns with the findings
 from the paper. The results that I believe most closely follow the experimental 
-set-up are computing accuracy of predicting the last sub-token. GPT2-small achieves an accuracy of 46.67% and the boosted GPT2-small achieves an accuracy of 64.70%; the paper achieved 47.66% and 66.70% respectively. Below are all the accuracies GPT2 achieved under different accuracy criterions.
+set-up are computing accuracy of predicting the last sub-token. GPT-2-small achieves an accuracy of 46.67% and the boosted GPT-2-small achieves an accuracy of 64.70%; the paper achieves 47.66% and 66.70% respectively. Below are all the accuracies results of the varying sizes of GPT-2.
 
-All accuracy results are obtained using one GPU (Tesla A100) through Colab. 
+All accuracy results are obtained using one GPU ($\texttt{Tesla A100}$) through Colab. 
 
 |  GPT-2  $(124M, 125M_{\dagger})$                               |   Results      | Paper Results |
 | ---                                    | ----           | ---           |
@@ -74,5 +72,3 @@ All GPT-3 Evaluations are obtained by using OpenAI's Completions [API](https://p
 ### Potential Reason for LAMBADA Accuracy Discrepencies
 
 The GPT-2 models on hugging face have parameter counts that are slightly different from the reported number of parameters the GPT2 models have in the paper (e.g., GPT-2-small 125M (paper) vs 124M (hugging face), GPT-2-large 760M (paper) vs 774M (hugging face)). 
-
-The GPT-3 models provided as endpoints might not be exactly the same GPT-3 models evaluated in the paper. The mapping of ada -> 2.7B, babbage -> 6.7B, curie -> 13B, davinci -> 175B is not defined explicitly, but it seems that this mapping is somewhat appropriate (https://blog.eleuther.ai/gpt3-model-sizes/). As these are the only GPT-3 models available, I conducted the evaluation on these GPT-3 variants.  
