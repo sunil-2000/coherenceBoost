@@ -64,11 +64,13 @@ All accuracy results are obtained using one GPU ($\texttt{Tesla A100}$) through 
 
 $\dagger$ are the GPT-2 parameter counts from the paper.
 
+#### Potential Reason for LAMBADA Accuracy Discrepencies
+
+The GPT-2 models on hugging face have parameter counts that are slightly different from the reported number of parameters the GPT2 models have in the paper (e.g., GPT-2-small 125M (paper) vs 124M (hugging face), GPT-2-large 760M (paper) vs 774M (hugging face)). 
+
+
 ### GPT-3 Evaluations
 
 All GPT-3 Evaluations are obtained by using OpenAI's Completions [API](https://platform.openai.com/docs/api-reference/completions?lang=python). One unfortunate constraint of this endpoint is that it only returns the top-5 logits corresponding to the tokens with highest probability. This might explain the magnitude differences between the boosted and regular model accuracies observed here and in the paper. By limiting to only top-5 logits, less information from the short context model is influencing the full-context model's output. Still, however, the results are consistent with the findings from the paper: coherence boosting improves long-range dependencies for LLMs. 
 
 
-### Potential Reason for LAMBADA Accuracy Discrepencies
-
-The GPT-2 models on hugging face have parameter counts that are slightly different from the reported number of parameters the GPT2 models have in the paper (e.g., GPT-2-small 125M (paper) vs 124M (hugging face), GPT-2-large 760M (paper) vs 774M (hugging face)). 
