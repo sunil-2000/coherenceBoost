@@ -71,6 +71,6 @@ The GPT-2 models on hugging face have parameter counts that are slightly differe
 
 ### GPT-3 Evaluations
 
-All GPT-3 Evaluations are obtained by using OpenAI's Completions [API](https://platform.openai.com/docs/api-reference/completions?lang=python). One unfortunate constraint of this endpoint is that it only returns the top-5 logits corresponding to the tokens with highest probability. This might explain the magnitude differences between the boosted and regular model accuracies observed here and in the paper. By limiting to only top-5 logits, less information from the short context model is influencing the full-context model's output. Still, however, the results are consistent with the findings from the paper: coherence boosting improves long-range dependencies for LLMs. 
+All GPT-3 evaluations are obtained by using OpenAI's Completions [API](https://platform.openai.com/docs/api-reference/completions?lang=python). One unfortunate constraint of this endpoint is that it only returns the top-5 logits corresponding to the tokens with highest probability. This might explain the magnitude differences between the boosted and regular model accuracies observed here and in the paper. By limiting to only top-5 logits, less information from the short context model is influencing the full-context model's output. Still, however, the results are consistent with the findings from the paper: coherence boosting improves long-range dependencies for LLMs. 
 
 
